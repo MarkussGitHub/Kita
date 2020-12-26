@@ -14,7 +14,7 @@ class Fun(commands.Cog):
     def __init__(self, kita):
         self.kita = kita
 
-    @commands.command(name='spotify', aliases=['sp'])
+    @commands.command(name='spotify', aliases=['sp'], help='Show off what you are listening to')
     async def spotify(self, ctx, *, user: discord.Member = None):
         sp = None
         if user == None:
@@ -69,7 +69,7 @@ class Fun(commands.Cog):
             file = discord.File(buffer, 'spotify.png')
             await ctx.send(file=file)
 
-    @commands.command(name='avatar')
+    @commands.command(name='avatar', help='Get your or someone elses avatar')
     async def avatar(self, ctx, *, user: discord.User = None):
         if user == None:
             r = requests.get(ctx.author.avatar_url)
