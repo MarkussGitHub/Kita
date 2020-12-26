@@ -59,8 +59,6 @@ class Fun(commands.Cog):
             minutes = int(duration) // 60
             seconds = int(duration) % 60
             duration = f'{minutes}:{seconds}'
-            #remaining = seconds/sp.end.second
-            #print(remaining)
             spotify.paste(line, (0, 175), line)
             draw.text((90, 190), '0:00', font=timeFont, fill='white')
             draw.text((385, 190), duration, font=timeFont, fill='white')
