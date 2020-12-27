@@ -14,7 +14,7 @@ class Fun(commands.Cog):
     def __init__(self, kita):
         self.kita = kita
 
-    @commands.command(name='spotify', aliases=['sp'], help='Show off what you are listening to')
+    @commands.command(name='spotify', aliases=['sp'])
     async def spotify(self, ctx, *, user: discord.Member = None):
         sp = None
         if user == None:
@@ -57,8 +57,13 @@ class Fun(commands.Cog):
 
             duration = str(sp.duration.total_seconds()).split(".")[0]
             minutes = int(duration) // 60
-            seconds = int(duration) % 60
+            seconds = (int(duration) % 60)
+            seconds = f"{seconds:02d}"
             duration = f'{minutes}:{seconds}'
+            #remaining = seconds/sp.end.second
+            #print(remaining)
+            trackId = sp.track_id
+
             spotify.paste(line, (0, 175), line)
             draw.text((90, 190), '0:00', font=timeFont, fill='white')
             draw.text((385, 190), duration, font=timeFont, fill='white')
@@ -67,9 +72,12 @@ class Fun(commands.Cog):
             spotify.save(buffer, format='PNG')
             buffer.seek(0)
             file = discord.File(buffer, 'spotify.png')
-            await ctx.send(file=file)
+            #await ctx.send(file=file)
+            embed = discord.Embed(description=f'[Listen on spotify](https://open.spotify.com/track/{trackId})', color=0xF2F2F2)
+            embed.set_image(url='attachment://spotify.png')
+            await ctx.send(embed=embed, file=file)
 
-    @commands.command(name='avatar', help='Get your or someone elses avatar')
+    @commands.command(name='avatar')
     async def avatar(self, ctx, *, user: discord.User = None):
         if user == None:
             r = requests.get(ctx.author.avatar_url)
