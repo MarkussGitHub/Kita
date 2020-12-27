@@ -18,5 +18,4 @@ for cog in os.listdir('./cogs'):
 async def on_ready():
   print('Kita is ready!')
 
-keep_alive.keep_alive()
 kita.run(os.getenv("TOKEN"))
