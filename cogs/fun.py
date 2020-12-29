@@ -54,9 +54,9 @@ class Fun(commands.Cog):
         else:
             spotify = Image.new('RGBA', (500, 220), 'white')
             line = Image.open('line.png')
-            songFont = ImageFont.truetype('arialUnicode.ttf', 24, encoding="unic")
-            artistFont = ImageFont.truetype('arialUnicode.ttf', 16, encoding="unic")
-            timeFont = ImageFont.truetype("arialUnicode.ttf", 12, encoding="unic")
+            songFont = ImageFont.truetype('fonts/arialUnicode.ttf', 24, encoding="unic")
+            artistFont = ImageFont.truetype('fonts/arialUnicode.ttf', 16, encoding="unic")
+            timeFont = ImageFont.truetype("fonts/arialUnicode.ttf", 12, encoding="unic")
 
             r = requests.get(sp.album_cover_url)
             bg = Image.open(io.BytesIO(r.content)).filter(ImageFilter.GaussianBlur(radius=6))
