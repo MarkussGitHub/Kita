@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-import keep_alive, os
+import os
 
 kita = commands.Bot(
     "ki ",
