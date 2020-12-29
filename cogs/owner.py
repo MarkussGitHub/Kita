@@ -1,7 +1,6 @@
 import discord
 from discord.ext import commands
 
-
 class Owner(commands.Cog):
     def __init__(self, kita):
         self.kita = kita
