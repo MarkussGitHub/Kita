@@ -1,6 +1,5 @@
 import discord
-import requests
-import io
+import requests, io
 from discord import Spotify
 from discord.ext import commands
 from random import randint, randrange, choice
@@ -13,6 +12,27 @@ def hexgen():
 class Fun(commands.Cog):
     def __init__(self, kita):
         self.kita = kita
+
+    @commands.command(name='explain', help='Dont know the meaning to something?')
+    async def explain(self, ctx, term):
+        url = f'http://api.urbandictionary.com/v0/define?term={term}'
+        r = requests.get(url).json()
+
+        correct = 0
+        for idx, value in enumerate(r['list']):
+            if value['thumbs_up'] > correct:
+                correct = value['thumbs_up']
+                correctIndex = idx
+        
+        author = r['list'][correctIndex]['author']
+        definition = r['list'][correctIndex]['definition']
+        url = r['list'][correctIndex]['permalink']
+        writtenOn = r['list'][correctIndex]['written_on'].split("T")[0]
+
+        embed = discord.Embed(title=f'{term}', url=url,
+                            description=f'```{definition}```')
+        embed.set_footer(text=f'Defined by {author}, {writtenOn}')
+        await ctx.send(embed=embed)
 
     @commands.command(name='spotify', aliases=['sp'])
     async def spotify(self, ctx, *, user: discord.Member = None):
@@ -34,9 +54,9 @@ class Fun(commands.Cog):
         else:
             spotify = Image.new('RGBA', (500, 220), 'white')
             line = Image.open('line.png')
-            songFont = ImageFont.truetype("sfpro.ttf", 24, encoding="unic")
-            artistFont = ImageFont.truetype("sfpro.ttf", 16, encoding="unic")
-            timeFont = ImageFont.truetype("sfpro.ttf", 12, encoding="unic")
+            songFont = ImageFont.truetype('arialUnicode.ttf', 24, encoding="unic")
+            artistFont = ImageFont.truetype('arialUnicode.ttf', 16, encoding="unic")
+            timeFont = ImageFont.truetype("arialUnicode.ttf", 12, encoding="unic")
 
             r = requests.get(sp.album_cover_url)
             bg = Image.open(io.BytesIO(r.content)).filter(ImageFilter.GaussianBlur(radius=6))
@@ -46,7 +66,18 @@ class Fun(commands.Cog):
             spotify.paste(newBG, (-80, -150))
             spotify.paste(album_cover, (200, 20))
 
-            title = sp.title
+            if len(sp.title) >= 25:
+                dots = "." * 3
+                title = sp.title[0:25] + dots
+            else:
+                title = sp.title
+
+            if len(sp.artist) >= 25:
+                dots = "." * 3
+                artist = sp.artist[0:25] + dots
+            else:
+                artist = sp.artist
+
             draw = ImageDraw.Draw(spotify)
             w, h = draw.textsize(title, font=songFont)
             draw.text(((500-w)/2, 130), u"{}".format(title), font=songFont, fill='white')
