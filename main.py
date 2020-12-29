@@ -8,6 +8,7 @@ kita = commands.Bot(
     case_insensitive=True,
     intents=discord.Intents.all()
 )
+kita.remove_command('help')
 
 # Loading all of our cogs, from "cogs" folder
 for cog in os.listdir('./cogs'):
