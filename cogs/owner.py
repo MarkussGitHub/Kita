@@ -4,16 +4,6 @@ from discord.ext import commands
 class Owner(commands.Cog):
     def __init__(self, kita):
         self.kita = kita
-        
-    @commands.Cog.listener()
-    async def on_guild_join(self, guild):
-        channel = self.kita.get_channel(793570196614545450)
-        embed = discord.Embed(title='Kita has been added to new server!')
-        embed.set_thumbnail(url=guild.icon_url)
-        embed.add_field(name='Server name', value=f'``{guild.name}``', inline=True)
-        embed.add_field(name='Server member count', value=f'``{guild.member_count}``', inline=True)
-        await channel.send(embed=embed)
-        await channel.send(f'Kita is now in {len(self.kita.guilds)} servers')
   
     @commands.command(name='reload', hidden=True)
     @commands.is_owner()
