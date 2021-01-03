@@ -2,6 +2,7 @@ import discord
 import requests, io
 from discord import Spotify
 from discord.ext import commands
+from datetime import datetime
 from random import randint, randrange, choice
 from PIL import Image, ImageDraw, ImageFont, ImageFilter, ImageEnhance
 
@@ -12,8 +13,8 @@ def hexgen():
 class Fun(commands.Cog):
     def __init__(self, kita):
         self.kita = kita
-
-    @commands.command(name='explain', help='Dont know the meaning to something?')
+        
+    @commands.command(name='explain', help='Have a word with unknown meaning?')
     async def explain(self, ctx, term):
         url = f'http://api.urbandictionary.com/v0/define?term={term}'
         r = requests.get(url).json()
@@ -34,15 +35,24 @@ class Fun(commands.Cog):
         embed.set_footer(text=f'Defined by {author}, {writtenOn}')
         await ctx.send(embed=embed)
 
-    @commands.command(name='spotify', aliases=['sp'])
+    @explain.error
+    async def explain_error(self, ctx, error):
+        if isinstance(error, commands.MissingRequiredArgument):
+            embed = discord.Embed(title='Missing Argument', description='You didnt tell me which word to explain!', color=0xFF0000)
+            embed.add_field(name='Example usage', value='```ki explain lmao```', inline=False)
+            embed.add_field(name='Expected response', value='```[Laughing] [My Ass Off]. Used [online] only.```')
+            await ctx.send(embed=embed)
+
+    @commands.command(name='spotify', aliases=['sp'], help='Flex with your music, or check out what others listen to')
     async def spotify(self, ctx, *, user: discord.Member = None):
         sp = None
         if user == None:
             user = ctx.author
         
-        for activity in user.activities:
-            if isinstance(activity, Spotify):
-                sp = activity
+        if user.activities:
+            for activity in user.activities:
+                if isinstance(activity, Spotify):
+                    sp = activity
 
         if sp == None:
             if user == ctx.author:
@@ -53,7 +63,7 @@ class Fun(commands.Cog):
                 await ctx.send(embed=embed)
         else:
             spotify = Image.new('RGBA', (500, 220), 'white')
-            line = Image.open('line.png')
+            line = Image.open('src/line.png')
             songFont = ImageFont.truetype('fonts/arialUnicode.ttf', 24, encoding="unic")
             artistFont = ImageFont.truetype('fonts/arialUnicode.ttf', 16, encoding="unic")
             timeFont = ImageFont.truetype("fonts/arialUnicode.ttf", 12, encoding="unic")
@@ -86,29 +96,32 @@ class Fun(commands.Cog):
             w, h = draw.textsize(artist, font=artistFont)
             draw.text(((500-w)/2, 160), u"{}".format(artist), font=artistFont, fill='white')
 
+            ongoing = sp.end - datetime.utcnow()
+            ongoing = str((sp.duration - ongoing).total_seconds()).split(".")[0]
+            ongoingMinutes = int(ongoing) // 60
+            ongoingSeconds = int(ongoing) % 60
+            ongoingSeconds = f'{ongoingSeconds:02d}'
+            ongoing = f'{ongoingMinutes}:{ongoingSeconds}'
+            draw.text((90, 190), ongoing, font=timeFont, fill='white')
+
             duration = str(sp.duration.total_seconds()).split(".")[0]
-            minutes = int(duration) // 60
-            seconds = (int(duration) % 60)
-            seconds = f"{seconds:02d}"
-            duration = f'{minutes}:{seconds}'
-            #remaining = seconds/sp.end.second
-            #print(remaining)
-            trackId = sp.track_id
+            maxMinutes = int(duration) // 60
+            maxSeconds = int(duration) % 60
+            maxSeconds = f"{maxSeconds:02d}"
+            duration = f'{maxMinutes}:{maxSeconds}'
+            draw.text((385, 190), duration, font=timeFont, fill='white')
 
             spotify.paste(line, (0, 175), line)
-            draw.text((90, 190), '0:00', font=timeFont, fill='white')
-            draw.text((385, 190), duration, font=timeFont, fill='white')
 
             buffer = io.BytesIO()
             spotify.save(buffer, format='PNG')
             buffer.seek(0)
             file = discord.File(buffer, 'spotify.png')
-            #await ctx.send(file=file)
-            embed = discord.Embed(description=f'[Listen on spotify](https://open.spotify.com/track/{trackId})', color=0xF2F2F2)
+            embed = discord.Embed(description=f'[Listen on spotify](https://open.spotify.com/track/{sp.track_id})', color=0xF2F2F2)
             embed.set_image(url='attachment://spotify.png')
             await ctx.send(embed=embed, file=file)
 
-    @commands.command(name='avatar')
+    @commands.command(name='avatar', help='Get your or someones avatar.')
     async def avatar(self, ctx, *, user: discord.User = None):
         if user == None:
             r = requests.get(ctx.author.avatar_url)
@@ -127,7 +140,7 @@ class Fun(commands.Cog):
             embed = discord.Embed(title='Couldnt find that member', color=0xFF0000)
             await ctx.send(embed=embed)
 
-    @commands.command(name='meme', help='Generate meme')
+    @commands.command(name='meme', help='Generate meme',)
     async def meme(self, ctx: commands.Context):
         image = requests.get('https://meme-api.herokuapp.com/gimme').json()
         embed = discord.Embed(color=hexgen())
