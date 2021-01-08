@@ -1,5 +1,6 @@
 import discord
 import requests, io
+import asyncio
 from discord import Spotify
 from discord.ext import commands
 from datetime import datetime
@@ -13,6 +14,27 @@ def hexgen():
 class Fun(commands.Cog):
     def __init__(self, kita):
         self.kita = kita
+
+    @commands.command(name='poll', help='Make a poll')
+    async def poll(self, ctx, *, question: str):
+        embed = discord.Embed(title='Poll', description=f'{question}', color=hexgen())
+        msg = await ctx.send(embed=embed)
+        await msg.add_reaction('✅')
+        await msg.add_reaction('❌')
+        await asyncio.sleep(10)
+        message = await ctx.channel.fetch_message(msg.id)
+        for react in message.reactions:
+            if react.emoji == '✅':
+                yes = react.count
+            if react.emoji == '❌':
+                no = react.count
+        await msg.delete()
+        embed = discord.Embed(title='Poll results', 
+                              description=f'✅ had {yes} votes\n\n'
+                                          f'❌ had {no} votes',
+                              color=hexgen())
+        await ctx.send(embed=embed)
+
         
     @commands.command(name='explain', help='Have a word with unknown meaning?')
     async def explain(self, ctx, term):
@@ -31,7 +53,7 @@ class Fun(commands.Cog):
         writtenOn = r['list'][correctIndex]['written_on'].split("T")[0]
 
         embed = discord.Embed(title=f'{term}', url=url,
-                            description=f'```{definition}```')
+                            description=f'```{definition}```', color=hexgen())
         embed.set_footer(text=f'Defined by {author}, {writtenOn}')
         await ctx.send(embed=embed)
 
