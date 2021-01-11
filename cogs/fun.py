@@ -1,6 +1,5 @@
 import discord
-import requests, io
-import asyncio
+import requests, io, asyncio
 from discord import Spotify
 from discord.ext import commands
 from datetime import datetime
@@ -14,6 +13,45 @@ def hexgen():
 class Fun(commands.Cog):
     def __init__(self, kita):
         self.kita = kita
+
+    @commands.command(name='findanime', help='Find anime by image')
+    @commands.cooldown(1, 6, commands.BucketType.guild)
+    async def findanime(self, ctx, imagelink: str = None):
+        if imagelink == None and len(ctx.message.attachments) != 0:
+            imagelink = ctx.message.attachments[0].url
+        if imagelink != None and '://' in imagelink:
+            url = f'https://trace.moe/api/search?url={imagelink}'
+            async with ctx.typing():
+                r = requests.get(url).json()['docs'][0]
+                
+                similarity = int(r['similarity'] * 100)
+                englishTitle = r['title_english']
+                malId = r['mal_id']
+
+                embed = discord.Embed(title=englishTitle,
+                                    description=f'[MyAnimeList](https://myanimelist.net/anime/{malId})')
+                embed.add_field(name='Similarity', value=f'``{similarity}%``')
+                embed.set_image(url=imagelink)
+                embed.set_footer(text='DISCLAIMER: There is no guarantee that its going to be the right anime!')
+            await ctx.send(embed=embed)
+        elif len(ctx.message.attachments) == 0:
+            embed = discord.Embed(title='Missing Argument!', 
+                                  description=f'You didnt give me picture to find anime by!',
+                                  color=0xFF0000)
+            await ctx.send(embed=embed)
+        else:
+            embed = discord.Embed(title='Incorrect Link!', 
+                                  description=f'It seems that you didnt give me a correct link!',
+                                  color=0xFF0000)
+            await ctx.send(embed=embed)
+        
+    @findanime.error
+    async def findanime_error(self, ctx, error):
+        if isinstance(error, commands.CommandOnCooldown):
+            embed = discord.Embed(title='Command on cooldown!', 
+                                  description=f'You can use this command after {error.retry_after} seconds',
+                                  color=0xFF0000)
+            await ctx.send(embed=embed)
 
     @commands.command(name='poll', help='Make a poll')
     async def poll(self, ctx, *, question: str):
