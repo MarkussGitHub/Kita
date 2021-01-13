@@ -9,4 +9,5 @@ An open source bot, that you can add to your server!
 
 ## Feedback
 You can leave feedback/suggestions using ``ki feedback`` !
+
 ![Feedback](https://i.gyazo.com/c7781ecb40361cfd0583f88b7da63eed.png)
