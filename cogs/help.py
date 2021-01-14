@@ -17,7 +17,7 @@ class Help(commands.Cog):
 
     def ctgry_list(self):
         ctgrylist = []
-        forbidden = ['Owner', 'Dev', 'Help']
+        forbidden = ['Owner', 'Help']
         for ctgry in self.kita.cogs:
             if ctgry not in forbidden:
                 ctgrylist.append(ctgry)
