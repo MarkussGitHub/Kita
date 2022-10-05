@@ -1,7 +1,5 @@
 # Kita
-An open source bot, that you can add to your server!
-
-[Invite](https://discord.com/oauth2/authorize?client_id=792091990387982366&permissions=8&scope=bot)
+An open source bot
 
 ![Help](https://i.gyazo.com/9b39319a0d2625025d1de7013e077161.gif)
 
